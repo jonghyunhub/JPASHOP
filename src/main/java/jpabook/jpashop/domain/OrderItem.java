@@ -25,6 +25,12 @@ public class OrderItem {
     private int orderPrice; //주문 당시의 가격
     private int count; //주문 당시의 수량
 
+    /**
+     * 생성 메서드 외에 생성자로 OrderItem 만드는 것을 방지
+     */
+    protected OrderItem() {
+    }
+
     //==생성 메서드==//
     public static OrderItem createOrderItem(Item item, int orderPrice, int count) {
         OrderItem orderItem = new OrderItem();
