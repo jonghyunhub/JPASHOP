@@ -1,5 +1,6 @@
 package jpabook.jpashop.service;
 
+import jpabook.exception.NotEnoughStockException;
 import jpabook.jpashop.domain.Address;
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.domain.Order;
@@ -7,7 +8,6 @@ import jpabook.jpashop.domain.OrderStatus;
 import jpabook.jpashop.domain.item.Book;
 import jpabook.jpashop.domain.item.Item;
 import jpabook.jpashop.repository.OrderRepository;
-import org.junit.Assert;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +36,9 @@ public class OrderServiceTest {
 
 
         //given
-        Member member = new Member();
-        member.setName("member1");
-        member.setAddress(new Address("서울", "강가", "123-123"));
-        em.persist(member);
+        Member member = createMember("member1");
 
-        Book book = new Book();
-        book.setName("책1");
-        book.setPrice(10000);
-        book.setStockQuantity(10);
-        em.persist(book);
+        Book book = createBook("책1", 10000, 10);
 
         int orderCount = 2;
 
@@ -61,6 +54,21 @@ public class OrderServiceTest {
         assertEquals("주문 수량만큼 재고가 줄어야 한다.", 8, book.getStockQuantity());
     }
 
+
+    @Test(expected = NotEnoughStockException.class)
+    public void 상품주문_재고수량초과() throws Exception {
+        //given
+        Member member = createMember("member1");
+        Item item = createBook("책1", 10000, 10);
+
+        int orderCount = 11;
+
+        //when
+        orderService.order(member.getId(), item.getId(), orderCount);
+        //then
+        fail("재고 수량 부족 에러가 발생해야 한다.");
+    }
+
     @Test
     public void 주문취소() throws Exception {
         //given
@@ -70,12 +78,21 @@ public class OrderServiceTest {
         //then
     }
 
-    @Test
-    public void 상품주문_재고수량초과() throws Exception {
-        //given
-
-        //when
-
-        //then
+    private Book createBook(String name, int price, int quantity) {
+        Book book = new Book();
+        book.setName(name);
+        book.setPrice(price);
+        book.setStockQuantity(quantity);
+        em.persist(book);
+        return book;
     }
+
+    private Member createMember(String name) {
+        Member member = new Member();
+        member.setName(name);
+        member.setAddress(new Address("서울", "강가", "123-123"));
+        em.persist(member);
+        return member;
+    }
+
 }
