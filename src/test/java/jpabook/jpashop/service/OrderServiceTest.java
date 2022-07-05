@@ -1,6 +1,6 @@
 package jpabook.jpashop.service;
 
-import jpabook.exception.NotEnoughStockException;
+import jpabook.jpashop.exception.NotEnoughStockException;
 import jpabook.jpashop.domain.Address;
 import jpabook.jpashop.domain.Member;
 import jpabook.jpashop.domain.Order;
